@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Product CRUD</title>
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body class="container mt-4">
+
+	<h3>Product CRUD with AJAX - Duy Shop</h3>
+
+	<!-- Form Thêm Mới -->
+	<form id="addProductForm">
+		<div class="mb-3">
+			<label>Title</label> <input type="text" id="productTitle"
+				class="form-control" required>
+		</div>
+		<div class="mb-3">
+			<label>Price</label> <input type="number" id="productPrice"
+				class="form-control" required>
+		</div>
+		<div class="mb-3">
+			<label>Description</label>
+			<textarea id="productDescription" class="form-control"></textarea>
+		</div>
+		<div class="mb-3">
+			<label>Quantity</label> <input type="number"
+				id="productQuantity" class="form-control" required>
+		</div>
+		<button type="submit" class="btn btn-primary">Add Product</button>
+	</form>
+
+	<hr>
+
+	<!-- Bảng hiển thị -->
+	<table class="table table-bordered" id="productTable">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Title</th>
+				<th>Price</th>
+				<th>Description</th>
+				<th>Quantity</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+
+	<!-- Modal Edit Product -->
+	<div class="modal fade" id="editProductModal" tabindex="-1"
+		aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form id="editProductForm">
+					<div class="modal-header">
+						<h5 class="modal-title">Edit Product</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+					<div class="modal-body">
+						<input type="hidden" id="editProductId">
+
+						<div class="mb-3">
+							<label>Title</label> <input type="text" id="editProductTitle"
+								class="form-control" required>
+						</div>
+						<div class="mb-3">
+							<label>Price</label> <input type="number" id="editProductPrice"
+								class="form-control" required>
+						</div>
+						<div class="mb-3">
+							<label>Description</label>
+							<textarea id="editProductDescription" class="form-control"></textarea>
+						</div>
+						<div class="mb-3">
+							<label>Quantity</label> <input type="number"
+								id="editProductQuantity" class="form-control" required>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">Cancel</button>
+						<button type="submit" class="btn btn-primary">Save
+							changes</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script>
+const apiUrl = "http://localhost:8096/graphql";
+
+function loadProducts() {
+  $.ajax({
+    url: apiUrl,
+    type: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({
+      query: `
+        query {
+    	  products {
+    		    id
+    		    title
+    		    description
+    		    price
+    		    quantity
+    		}
+        }
+      `
+    }),
+    success: function(res) {
+      let rows = "";
+      res.data.products.forEach(p => {
+        rows += `
+          <tr>
+            <td>${p.id}</td>
+            <td>${p.title}</td>
+            <td>${p.price}</td>
+            <td>${p.description || ""}</td>
+            <td>${p.quantity}</td>
+            <td>
+              <button class="btn btn-sm btn-warning" onclick="editProduct(${p.id})">Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})">Delete</button>
+            </td>
+          </tr>
+        `;
+      });
+      $("#productTable tbody").html(rows);
+    }
+  });
+}
+
+$("#addProductForm").submit(function(e) {
+  e.preventDefault();
+
+  const title = $("#productTitle").val();
+  const price = $("#productPrice").val();
+  const description = $("#productDescription").val();
+  const quantity = $("#productQuantity").val();
+
+  $.ajax({
+    url: apiUrl,
+    type: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({
+      query: `
+        mutation {
+          createProduct(title: "${title}", price: ${price}, description: "${description}", quantity: ${quantity}) {
+            id
+            title
+          }
+        }
+      `
+    }),
+    success: function() {
+      alert("Thêm sản phẩm thành công!");
+      loadProducts();
+      $("#addProductForm")[0].reset();
+    }
+  });
+});
+
+function editProduct(id) {
+  $.ajax({
+    url: apiUrl,
+    type: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({
+      query: `
+        query {
+          productById(id: ${id}) {
+            id
+            title
+            price
+            description
+            quantity
+          }
+        }
+      `
+    }),
+    success: function(res) {
+      const p = res.data.productById;
+      $("#editProductId").val(p.id);
+      $("#editProductTitle").val(p.title);
+      $("#editProductPrice").val(p.price);
+      $("#editProductDescription").val(p.description || "");
+      $("#editProductQuantity").val(p.quantity);
+      new bootstrap.Modal(document.getElementById('editProductModal')).show();
+    }
+  });
+}
+
+$("#editProductForm").submit(function(e) {
+  e.preventDefault();
+
+  const id = $("#editProductId").val();
+  const title = $("#editProductTitle").val();
+  const price = $("#editProductPrice").val();
+  const description = $("#editProductDescription").val();
+  const quantity = $("#editProductQuantity").val();
+
+  $.ajax({
+    url: apiUrl,
+    type: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({
+      query: `
+        mutation {
+          updateProduct(id: ${id}, title: "${title}", price: ${price}, description: "${description}", quantity: ${quantity}) {
+            id
+            title
+          }
+        }
+      `
+    }),
+    success: function() {
+      alert("Cập nhật thành công!");
+      loadProducts();
+      bootstrap.Modal.getInstance(document.getElementById('editProductModal')).hide();
+    }
+  });
+});
+
+function deleteProduct(id) {
+  if (confirm("Are you sure?")) {
+    $.ajax({
+      url: apiUrl,
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({
+        query: `
+          mutation {
+            deleteProduct(id: ${id})
+          }
+        `
+      }),
+      success: function() {
+        alert("Xóa sản phẩm thành công!");
+        loadProducts();
+      }
+    });
+  }
+}
+
+loadProducts();
+</script>
+</body>
+</html>
