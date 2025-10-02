@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/layout-admin.html}">
+<head>
+<title>Admin Home</title>
+</head>
+<body>
+	<section class="row" layout:fragment="content">
+		<div class="col mt-4">
+			<div class="card">
+				<div class="card-header">Welcome Admin!</div>
+				<div class="card-body">
+					<a th:href="@{/admin/category}">Manage Categories</a><br> <a
+						th:href="@{/admin/product}">Manage Products</a><br> <a
+						th:href="@{/logout}">Logout</a>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>
