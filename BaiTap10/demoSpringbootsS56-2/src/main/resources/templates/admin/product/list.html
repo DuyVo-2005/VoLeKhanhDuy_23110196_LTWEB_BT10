@@ -6,7 +6,7 @@
 	<section class="row" layout:fragment="content">
 		<div class="col mt-4">
 			<div class="card">
-				<div class="card-header">List Category</div>
+				<div class="card-header">List Product</div>
 				<div class="card-body">
 
 					<!-- Hiển thị thông báo -->
@@ -18,22 +18,22 @@
 					<table class="table table-striped table-responsive">
 						<thead>
 							<tr>
-								<th>Category ID</th>
-								<th>Category Name</th>
+								<th>Product ID</th>
+								<th>Product Name</th>
 								<th>Action</th>
 							</tr>
 						</thead>
 						<tbody>
-							<tr th:each="cate : ${categories}">
-								<td th:text="${cate.categoryId}"></td>
-								<td th:text="${cate.name}"></td>
+							<tr th:each="pro : ${products}">
+								<td th:text="${pro.productId}"></td>
+								<td th:text="${pro.name}"></td>
 								<td><a
-									th:href="@{/admin/category/view/{id}(id=${cate.categoryId})}"
+									th:href="@{/admin/product/view/{id}(id=${pro.productId})}"
 									class="btn btn-outline-info"><i class="fa fa-info"></i></a> <a
-									th:href="@{/admin/category/edit/{id}(id=${cate.categoryId})}"
+									th:href="@{/admin/product/edit/{id}(id=${pro.productId})}"
 									class="btn btn-outline-warning"><i class="fa fa-edit"></i></a>
 									<a
-									th:href="@{/admin/category/delete/{id}(id=${cate.categoryId})}"
+									th:href="@{/admin/product/delete/{id}(id=${pro.productId})}"
 									class="btn btn-outline-danger"><i class="fa fa-trash"></i></a>
 								</td>
 							</tr>

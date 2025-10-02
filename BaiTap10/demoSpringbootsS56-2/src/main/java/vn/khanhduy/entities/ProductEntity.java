@@ -40,7 +40,7 @@ public class ProductEntity implements Serializable{
 	@Column(nullable = false)
 	int quantity;
 	@Column(nullable = false)
-	double unitPrice;
+	double unit_price;
 	@Column(length = 200)
 	String images;
 	@Column(columnDefinition = "nvarchar(500) not null")

@@ -30,8 +30,9 @@ public class AdminController {
 	}
 
 	@GetMapping("/admin/product")
-	public String manageProduct() {
-		return "admin/product";
+	public ModelAndView manageProduct(ModelMap model) {
+		//return "admin/product";
+		return new ModelAndView("redirect:/admin/product/searchpaginated?page=1&size=3", model);
 	}
 
 }
